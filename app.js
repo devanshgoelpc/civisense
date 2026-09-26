@@ -1274,9 +1274,16 @@ function openReportModal(reportId) {
     const loc    = getLocationLabel(report);
     const ts     = formatTimestamp(report.timestamp);
 
-    const nearbyPlaces = Array.isArray(report.nearbyPlaces)
-        ? report.nearbyPlaces.join(', ')
-        : (report.nearbyPlaces || 'N/A');
+  const nearbyPlaces = Array.isArray(report.nearbyPlaces) && report.nearbyPlaces.length > 0
+    ? report.nearbyPlaces.map(p => {
+        if (typeof p === 'object' && p !== null) {
+            const name = p.name || p.place || p.vicinity || 'Landmark';
+            const dist = p.distance ? ` (${p.distance})` : '';
+            return `${name}${dist}`;
+        }
+        return String(p);
+    }).join(', ')
+    : (report.nearbyPlaces || 'N/A');
 
     // Build status buttons
     const statusBtns = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED'].map((s) => {
