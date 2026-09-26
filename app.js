@@ -1274,16 +1274,21 @@ function openReportModal(reportId) {
     const loc    = getLocationLabel(report);
     const ts     = formatTimestamp(report.timestamp);
 
-  const nearbyPlaces = Array.isArray(report.nearbyPlaces) && report.nearbyPlaces.length > 0
-    ? report.nearbyPlaces.map(p => {
-        if (typeof p === 'object' && p !== null) {
-            const name = p.name || p.place || p.vicinity || 'Landmark';
-            const dist = p.distance ? ` (${p.distance})` : '';
-            return `${name}${dist}`;
-        }
-        return String(p);
-    }).join(', ')
-    : (report.nearbyPlaces || 'N/A');
+      let nearbyPlaces = 'None nearby';
+    if (report.nearbyPlaces) {
+        const items = Array.isArray(report.nearbyPlaces) 
+            ? report.nearbyPlaces 
+            : (typeof report.nearbyPlaces === 'object' ? Object.values(report.nearbyPlaces) : [report.nearbyPlaces]);
+
+        nearbyPlaces = items.map(p => {
+            if (typeof p === 'object' && p !== null) {
+                const name = p.name || p.place || p.title || 'Landmark';
+                const dist = p.distance ? ` (${p.distance})` : '';
+                return `${name}${dist}`;
+            }
+            return String(p);
+        }).join(', ');
+    }
 
     // Build status buttons
     const statusBtns = ['NEW', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED'].map((s) => {
